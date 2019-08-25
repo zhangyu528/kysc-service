@@ -2,7 +2,9 @@
 
 from flask import Flask
 from flask_restful import Api, Resource
-
+from database.mongo import client
+from bson import json_util
+import json
 
 class User(Resource):
     def get(self):

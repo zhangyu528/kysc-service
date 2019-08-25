@@ -22,11 +22,11 @@ class List(Resource):
         if len(cat_id) == 0:
             return {'message':'参数错误'}, 1001
         
-        category = self.db['category']
-        goods_id = category.find_one({'cat_id':cat_id}, {'goods': 1, '_id': 0})
+        category_collection = self.db['category']
+        goods_id = category_collection.find_one({'cat_id':cat_id}, {'goods': 1, '_id': 0})
         ids = json.loads(json_util.dumps(goods_id))['goods']
-        good = self.db['good']
-        return {'message':'成功', 'data':json_util.dumps(good.find({'id': { '$in': ids }}, {'_id':0}))}, 200
+        good_collection = self.db['good']
+        return {'message':'成功', 'data':json_util.dumps(good_collection.find({'id': { '$in': ids }}, {'_id':0}))}, 200
 
 
 if __name__ == "__main__":
