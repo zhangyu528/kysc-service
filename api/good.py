@@ -13,7 +13,7 @@ class Category(Resource):
     def post(self):
         category_collection = self.db['category']
         category = category_collection.find({})
-        data = json_util.dumps(category)
+        data = json.loads(json_util.dumps(category))
         return {'message':'成功', 'data':data}, 200
 
 class List(Resource):
