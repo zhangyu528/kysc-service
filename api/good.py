@@ -5,6 +5,16 @@ from database.mongo import client
 from bson import json_util
 import json
 
+class Category(Resource):
+    def __init__(self):
+        self.db = client["main"]
+        super(Category, self).__init__()
+    
+    def post(self):
+        category_collection = self.db['category']
+        category = category_collection.find({})
+        data = json_util.dumps(category)
+        return {'message':'成功', 'data':data}, 200
 
 class List(Resource):
     def __init__(self):
@@ -33,4 +43,5 @@ if __name__ == "__main__":
     app = Flask(__name__)
     api = Api(app)
     api.add_resource(List, 'good/list')
+    api.add_resource(Category, 'good/category')
     app.run(debug=True)
