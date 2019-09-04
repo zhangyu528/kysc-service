@@ -36,7 +36,8 @@ class List(Resource):
         goods_id = category_collection.find_one({'cat_id':cat_id}, {'goods': 1, '_id': 0})
         ids = json.loads(json_util.dumps(goods_id))['goods']
         good_collection = self.db['good']
-        return {'message':'成功', 'data':json_util.dumps(good_collection.find({'id': { '$in': ids }}, {'_id':0}))}, 200
+        data = json.loads(json_util.dumps(good_collection.find({'id': { '$in': ids }}, {'_id':0})))
+        return {'message':'成功', 'data':data}, 200
 
 
 if __name__ == "__main__":
