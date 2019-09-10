@@ -99,10 +99,6 @@ class UserName(Resource):
         )
         return {'message':'成功', 'token':token}, 200
 
-class Auth(Resource):
-    def __init__(self):
-        super(Auth, self).__init__()
-
 
 if __name__ == "__main__":
     app = Flask(__name__)
