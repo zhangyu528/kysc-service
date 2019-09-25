@@ -31,3 +31,6 @@ sudo yum -y install python-pip
 
 ## 安装itsdangerous
 * sudo pip install itsdangerous
+
+## 安装pycrypto
+* sudo pip install pycrypto
