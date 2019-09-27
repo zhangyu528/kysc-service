@@ -13,7 +13,6 @@ class WXAuth(Resource):
     def __init__(self):
         self.parser = reqparse.RequestParser()
         self.parser.add_argument('code', type=str)
-        self.parser.add_argument('sessionKey', type=str)
         self.parser.add_argument('encryptedData', type=str)
         self.parser.add_argument('iv', type=str)
 
@@ -21,16 +20,11 @@ class WXAuth(Resource):
         super(WXAuth, self).__init__()
 
     def post(self):
-        appid = 'wxc4e842b5c56f443c'
 
-        args = self.prase.parse_args()
+        args = self.parser.parse_args()
 
         code = args['code']
         if code is None or code is None:
-            return {'message':'参数错误'}, 1001
-
-        sessionKey = args['sessionKey']
-        if sessionKey is None or code is None:
             return {'message':'参数错误'}, 1001
 
         encryptedData = args['encryptedData']
@@ -41,29 +35,31 @@ class WXAuth(Resource):
         if iv is None or code is None:
             return {'message':'参数错误'}, 1001
 
+        appid = 'wxc4e842b5c56f443c'
+        secret = '77b0864fffbd6b395fdaa4e28fb27c72'
+        payload = {
+            'appid': appid,
+            'secret': secret,
+            'js_code': code,
+            'grant_type': 'authorization_code'
+        }
+        url = 'https://api.weixin.qq.com/sns/jscode2session'
+        r = requests.get(url, params = payload)
+        sessionKey = r.json()['session_key']
+
         pc = WXBizDataCrypt(appid, sessionKey)
 
-        print pc.decrypt(encryptedData, iv)
+        data = pc.decrypt(encryptedData, iv)
 
-
-        # payload = {
-        #     'appid': appid,
-        #     'secret': secret,
-        #     'js_code': code,
-        #     'grant_type': 'authorization_code'
-        # }
-        # url = 'https://api.weixin.qq.com/sns/jscode2session'
-        # r = requests.get(url, params = payload)
-        # print(r)
-        # openid = r.json()['openid']
-        # token = JSONWebSignatureSerializer('secret-key')
-        # token = token.dumps({'openid': openid, 'time':time.time()})
-        # user_collection = self.db['user']
-        # user_collection.update(
-        #     {'openid': openid},
-        #     {'$set': {'token': token}},
-        #     True
-        # )
+        openId = data['openId']
+        token = JSONWebSignatureSerializer('secret-key')
+        token = token.dumps({'openId': openId, 'time':time.time()})
+        user_collection = self.db['user']
+        user_collection.update(
+            {'openId': openId},
+            {'$set': {'token': token}},
+            True
+        )
         return {'message':'成功', 'token':'token'}, 200
         
 if __name__ == "__main__":
