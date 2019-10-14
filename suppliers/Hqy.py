@@ -47,6 +47,23 @@ class Hqy:
         r = requests.post(url, headers = headers, json = json)
         return r.json()
 
+    def good_detail(self, act_gid):
+        if act_gid is None:
+            return {'message':'参数错误'}, 1001
+
+        if Hqy.isLogin() is False:
+            self.login()
+
+        path = '/buymanager/goods/detail'
+        url = Hqy.root + path
+        json = {
+            'act_gid': act_gid,
+        }
+        Authorization = 'bearer ' + self.token
+        headers = {'Authorization': Authorization}
+        r = requests.post(url, headers = headers, json = json)
+        return r.json()
+
     def buy(self, good_id, good_cnt):
         json = {
             'act_gid': good_id,

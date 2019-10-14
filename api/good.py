@@ -6,6 +6,25 @@ from bson import json_util
 import json
 from suppliers.Hqy import Hqy
 
+class Detail(Resource):
+    def __init__(self):
+        self.parser = reqparse.RequestParser()
+        self.parser.add_argument('act_id', type=str)
+        super(Detail, self).__init__()
+
+    def post(self):
+        args = self.parser.parse_args()
+        act_id = args['act_id']
+        if act_id is None:
+            return {'message':'参数错误'}, 1001
+
+        #调用供应商提供接口获取商品list
+        hqy = Hqy()
+        result = hqy.good_detail(act_id)
+        # data = result['result']['goods']
+        print(result)
+        return {'message':'成功', 'data':result}, 200
+
 class Category(Resource):
     def __init__(self):
         self.db = client["main"]
@@ -50,6 +69,7 @@ class List(Resource):
 if __name__ == "__main__":
     app = Flask(__name__)
     api = Api(app)
-    api.add_resource(List, 'good/list')
-    api.add_resource(Category, 'good/category')
+    api.add_resource(List, '/good/list')
+    api.add_resource(Category, '/good/category')
+    api.add_resource(Detail, '/good/detail')
     app.run(debug=True)

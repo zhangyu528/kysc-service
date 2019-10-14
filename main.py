@@ -7,6 +7,8 @@ from api.user import User
 from api.login import Tel
 from api.good import List
 from api.good import Category
+from api.good import Detail
+
 from api.auth import WXAuth
 from suppliers.Hqy import Hqy
 
@@ -18,6 +20,7 @@ api.add_resource(User, '/user')
 api.add_resource(List, '/good/list')
 api.add_resource(Category, '/good/category')
 api.add_resource(WXAuth, '/auth/wx')
+api.add_resource(Detail, '/good/detail')
 
 if __name__ == "__main__":
     app.run(debug=True)
