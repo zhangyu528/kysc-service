@@ -21,9 +21,8 @@ class Detail(Resource):
         #调用供应商提供接口获取商品list
         hqy = Hqy()
         result = hqy.good_detail(act_id)
-        # data = result['result']['goods']
-        print(result)
-        return {'message':'成功', 'data':result}, 200
+        data = result['result']['goods_info']
+        return {'message':'成功', 'data':data}, 200
 
 class Category(Resource):
     def __init__(self):
