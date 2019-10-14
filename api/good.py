@@ -11,7 +11,7 @@ class Category(Resource):
         self.db = client["main"]
         super(Category, self).__init__()
     
-    def post(self):
+    def get(self):
         category_collection = self.db['category']
         category = category_collection.find({})
         data = json.loads(json_util.dumps(category))
@@ -38,7 +38,7 @@ class List(Resource):
         # ids = json.loads(json_util.dumps(goods_id))['goods']
         # good_collection = self.db['good']
         # data = json.loads(json_util.dumps(good_collection.find({'id': { '$in': ids }}, {'_id':0})))
-        
+
         #调用供应商提供接口获取商品list
         hqy = Hqy()
         result = hqy.goods_list(cat_id)
