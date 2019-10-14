@@ -4,6 +4,7 @@ from flask_restful import Api, Resource, reqparse
 from database.mongo import client
 from bson import json_util
 import json
+from suppliers.Hqy import Hqy
 
 class Category(Resource):
     def __init__(self):
@@ -32,11 +33,17 @@ class List(Resource):
         if len(cat_id) == 0:
             return {'message':'参数错误'}, 1001
         
-        category_collection = self.db['category']
-        goods_id = category_collection.find_one({'cat_id':cat_id}, {'goods': 1, '_id': 0})
-        ids = json.loads(json_util.dumps(goods_id))['goods']
-        good_collection = self.db['good']
-        data = json.loads(json_util.dumps(good_collection.find({'id': { '$in': ids }}, {'_id':0})))
+        # category_collection = self.db['category']
+        # goods_id = category_collection.find_one({'cat_id':cat_id}, {'goods': 1, '_id': 0})
+        # ids = json.loads(json_util.dumps(goods_id))['goods']
+        # good_collection = self.db['good']
+        # data = json.loads(json_util.dumps(good_collection.find({'id': { '$in': ids }}, {'_id':0})))
+        
+        #调用供应商提供接口获取商品list
+        hqy = Hqy()
+        result = hqy.goods_list(cat_id)
+        data = result['result']['goods']
+        print(data)
         return {'message':'成功', 'data':data}, 200
 
 

@@ -19,8 +19,5 @@ api.add_resource(List, '/good/list')
 api.add_resource(Category, '/good/category')
 api.add_resource(WXAuth, '/auth/wx')
 
-hqy = Hqy()
-hqy.login()
-
 if __name__ == "__main__":
     app.run(debug=True)
