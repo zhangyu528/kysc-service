@@ -7,6 +7,8 @@ from database.mongo import client
 from bson import json_util
 import json
 
+from response import *
+
 class Tel(Resource):
     def __init__(self):
         self.parser = reqparse.RequestParser()
@@ -17,13 +19,16 @@ class Tel(Resource):
         
     def post(self):
         args = self.parser.parse_args()
-        phone = args['phone']
-        code = args['code']
 
-        if phone is None or code is None:
-            return {'message':'参数错误'}, 1001
-        if len(phone) == 0 or len(code) == 0:
-            return {'message':'参数错误'}, 1001
+        phone = args['phone']
+        error = ApiError.check_param(phone, str)
+        if error is not None:
+            return error
+            
+        code = args['code']
+        error = ApiError.check_param(code, str)
+        if error is not None:
+            return error
 
         token = JSONWebSignatureSerializer('secret-key')
         token = token.dumps({'phone': phone, 'time':time.time()})
@@ -33,7 +38,8 @@ class Tel(Resource):
             {'$set': {'token': token}},
             True
         )
-        return {'message':'成功', 'token':token}, 200
+        data = {'token':token}
+        return ApiSuccess.success(data)
 
 class UserReg(Resource):
     def __init__(self):
@@ -42,12 +48,13 @@ class UserReg(Resource):
     def post(self):
         args = self.prase.parse_args()
         username = args['username']
+        error = ApiError.check_param(username, str)
+        if error is not None:
+            return error
         password = args['password']
-
-        if username is None or password is None:
-            return {'message':'参数错误'}, 1001
-        if len(username) == 0 or len(password) == 0:
-            return {'message':'参数错误'}, 1001
+        error = ApiError.check_param(password, str)
+        if error is not None:
+            return error
         
         user_collection = self.db['user']
         result = user_collection.find(
@@ -55,8 +62,8 @@ class UserReg(Resource):
                 'username': username
             }
         )
-        if result is None:
-            return {'message':'用户已经注册'}, 2001
+        if result is not None:
+            return ApiError.user_exist_error
         
         token = JSONWebSignatureSerializer('secret-key')
         token = token.dumps({'username': username, 'time':time.time()})
@@ -67,7 +74,8 @@ class UserReg(Resource):
                 'token': token
             }
         })
-        return {'message':'成功', 'token':token}, 200
+        data = {'token':token}
+        return ApiSuccess.success(data)
 
 class UserName(Resource):
     def __init__(self):
@@ -79,12 +87,13 @@ class UserName(Resource):
     def post(self):
         args = self.prase.parse_args()
         username = args['username']
+        error = ApiError.check_param(username, str)
+        if error is not None:
+            return error
         password = args['password']
-
-        if username is None or password is None:
-            return {'message':'参数错误'}, 1001
-        if len(username) == 0 or len(password) == 0:
-            return {'message':'参数错误'}, 1001
+        error = ApiError.check_param(password, str)
+        if error is not None:
+            return error
 
         token = JSONWebSignatureSerializer('secret-key')
         token = token.dumps({'username': username, 'time':time.time()})
@@ -97,7 +106,8 @@ class UserName(Resource):
             },
             False
         )
-        return {'message':'成功', 'token':token}, 200
+        data = {'token':token}
+        return ApiSuccess.success(data)
 
 
 if __name__ == "__main__":

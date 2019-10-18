@@ -4,7 +4,9 @@ from flask_restful import Api, Resource, reqparse
 from database.mongo import client
 from bson import json_util
 import json
+
 from suppliers.Hqy import Hqy
+from response import *
 
 class Detail(Resource):
     def __init__(self):
@@ -15,14 +17,20 @@ class Detail(Resource):
     def post(self):
         args = self.parser.parse_args()
         act_id = args['act_id']
-        if act_id is None:
-            return {'message':'参数错误'}, 1001
 
+        #参数校验
+        error = ApiError.check_param(act_id, str)
+        if error is not None:
+            return error
+        
         #调用供应商提供接口获取商品list
         hqy = Hqy()
-        result = hqy.good_detail(act_id)
-        data = result['result']['goods_info']
-        return {'message':'成功', 'data':data}, 200
+        resp = hqy.good_detail(act_id)
+        if resp['status'] == 'y':
+            data = resp['result']['goods_info']
+            return ApiSuccess.success(data)
+        else:
+            return ApiError.suppliers_service_errror
 
 class Category(Resource):
     def __init__(self):
@@ -33,7 +41,7 @@ class Category(Resource):
         category_collection = self.db['category']
         category = category_collection.find({})
         data = json.loads(json_util.dumps(category))
-        return {'message':'成功', 'data':data}, 200
+        return ApiSuccess.success(data)
 
 class List(Resource):
     def __init__(self):
@@ -45,24 +53,19 @@ class List(Resource):
     def post(self):
         args = self.parser.parse_args()
         cat_id = args['cat_id']
-
-        if cat_id is None:
-            return {'message':'参数错误'}, 1001
-        if len(cat_id) == 0:
-            return {'message':'参数错误'}, 1001
-        
-        # category_collection = self.db['category']
-        # goods_id = category_collection.find_one({'cat_id':cat_id}, {'goods': 1, '_id': 0})
-        # ids = json.loads(json_util.dumps(goods_id))['goods']
-        # good_collection = self.db['good']
-        # data = json.loads(json_util.dumps(good_collection.find({'id': { '$in': ids }}, {'_id':0})))
+        #参数校验
+        error = ApiError.check_param(cat_id, str)
+        if error is not None:
+            return error
 
         #调用供应商提供接口获取商品list
         hqy = Hqy()
-        result = hqy.goods_list(cat_id)
-        data = result['result']['goods']
-        print(data)
-        return {'message':'成功', 'data':data}, 200
+        resp = hqy.goods_list(cat_id)
+        if resp['status'] == 'y':
+            data = resp['result']['goods']
+            return ApiSuccess.success(data)
+        else:
+            return ApiError.suppliers_service_errror
 
 
 if __name__ == "__main__":

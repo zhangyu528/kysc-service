@@ -27,8 +27,6 @@ class Hqy:
         Hqy.token = r.json()['result']['token']
         return
 
-
-
     def goods_list(self, cat_id):
 
         if cat_id is None:
@@ -42,7 +40,7 @@ class Hqy:
         json = {
             'cat_id': cat_id,
         }
-        Authorization = 'bearer ' + self.token
+        Authorization = 'bearer ' + Hqy.token
         headers = {'Authorization': Authorization}
         r = requests.post(url, headers = headers, json = json)
         return r.json()
@@ -59,18 +57,47 @@ class Hqy:
         json = {
             'act_gid': act_gid,
         }
-        Authorization = 'bearer ' + self.token
+        Authorization = 'bearer ' + Hqy.token
         headers = {'Authorization': Authorization}
         r = requests.post(url, headers = headers, json = json)
         return r.json()
 
-    def buy(self, good_id, good_cnt):
+    def buy(self, act_id, num):
+        if act_id is None:
+            return {'message':'参数错误'}, 1001
+        if num is None:
+            return {'message':'参数错误 '}, 1001
+        
+        if Hqy.isLogin() is False:
+            self.login()
+
         json = {
-            'act_gid': good_id,
-            'num': good_cnt
+            'act_gid': act_id,
+            'num': num
         }
         path = '/buymanager/goods/buy'
         url = Hqy.root + path
-        r = requests.post(url, json = json)
+        Authorization = 'bearer ' + self.token
+        headers = {'Authorization': Authorization}
+        r = requests.post(url, headers = headers, json = json)
+        print(r)
+        return
+
+    def doPay(self, order_id):
+        if order_id is None:
+            return {'message':'参数错误'}, 1001
+
+        if Hqy.isLogin() is False:
+            self.login()
+
+        json = {
+            'order_id': order_id,
+            'passwd': '123456'
+        }
+        path = '/buymanager/order/do_pay'
+        url = Hqy.root + path
+        Authorization = 'bearer ' + self.token
+        headers = {'Authorization': Authorization}
+        r = requests.post(url, headers = headers, json = json)
         print(r)
         return
