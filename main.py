@@ -23,4 +23,4 @@ api.add_resource(PrePay, '/order/prePay')
 api.add_resource(DoPay, '/order/doPay')
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, host='10.10.46.91', port=5000)

@@ -80,8 +80,7 @@ class Hqy:
         Authorization = 'bearer ' + self.token
         headers = {'Authorization': Authorization}
         r = requests.post(url, headers = headers, json = json)
-        print(r)
-        return
+        return r.json()
 
     def doPay(self, order_id):
         if order_id is None:

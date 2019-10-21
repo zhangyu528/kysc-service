@@ -5,7 +5,7 @@ from database.mongo import client
 from bson import json_util
 import json
 from suppliers.Hqy import Hqy
-from sns.Wx import Wx
+from sns.Wx import *
 from response import *
 
 class PrePay(Resource):
@@ -22,6 +22,7 @@ class PrePay(Resource):
         act_id = args['act_id']
         num = args['num']
         token = args['Authorization']
+        print(args)
 
         error = ApiError.check_param(act_id, str)
         if error is not None:
@@ -38,16 +39,20 @@ class PrePay(Resource):
         result = hqy.buy(act_id, num)
         data = result['result']
         order_id = data['order_id']
-
+        order_amount = data['order_amount']
         #查找openId
         user_collection = self.db['user']
         result = user_collection.find_one({'token':token}, {'openId': 1, '_id': 0})
         data = json.loads(json_util.dumps(result))
-        openId = data['openId']
+        openid = data['openId']
         #调用微信统一支付订单
-        wx = Wx()
+        appid = 'wxc4e842b5c56f443c'
+        mch_id = 'wx9e0080344e8f9a42'
+        out_trade_no = order_id
+        total_fee = order_amount
+        wxPay = WxPay()
+        wxPay.unified_order(appid=appid, mch_id=mch_id, openid=openid, out_trade_no=out_trade_no, total_fee=total_fee)
         #二次签名返回给前端
-        print(result)
         return {'message':'成功', 'data':data}, 200
 
 # 支付成功回调url
@@ -71,6 +76,6 @@ class DoPay(Resource):
 if __name__ == "__main__":
     app = Flask(__name__)
     api = Api(app)
-    api.add_resource(PrePay, 'order/prePay')
+    api.add_resource(PrePay, '/order/prePay')
     api.add_resource(DoPay, '/order/doPay')
     app.run(debug=True)

@@ -11,6 +11,7 @@ except Exception:
 
 from aes.WXBizDataCrypt import WXBizDataCrypt
 
+__all__ = ["Wx", "WxPay"]
 
 class Wx:
     def jscode2ses(self, code, appid, secret, encryptedData, iv):
@@ -83,12 +84,12 @@ class WxPay:
         if "total_fee" not in data:
             raise WxPayError.total_fee_error
 
-        data["body"] = 'kysc-卡券'
+        data["body"] = 'kysc'
         data["trade_type"] = 'JSAPI'
         data["notify_url"] = 'http://localhost/order/doPay'
         data["nonce_str"] = self.nonce_str
         data["sign"] = self.sign(data)
 
         resp = requests.post(url, data = data)
-        print(resp)
+        print(resp.json())
         pass
