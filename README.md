@@ -34,3 +34,10 @@ sudo yum -y install python-pip
 
 ## 安装pycrypto
 * sudo pip install pycrypto
+
+centOS需要以下
+yum install gcc
+
+yum install gcc-c++
+
+yum install python-devel
