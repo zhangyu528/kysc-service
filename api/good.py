@@ -39,14 +39,14 @@ class Category(Resource):
     
     def get(self):
         category_collection = self.db['category']
-        category = category_collection.find({})
+        category = category_collection.find({}, {'_id':0})
         data = json.loads(json_util.dumps(category))
         return ApiSuccess.success(data)
 
 class List(Resource):
     def __init__(self):
         self.parser = reqparse.RequestParser()
-        self.parser.add_argument('cat_id', type=str)
+        self.parser.add_argument('cat_id', type=int)
         self.db = client["main"]
         super(List, self).__init__()
     
@@ -54,7 +54,7 @@ class List(Resource):
         args = self.parser.parse_args()
         cat_id = args['cat_id']
         #参数校验
-        error = ApiError.check_param(cat_id, str)
+        error = ApiError.check_param(cat_id, int)
         if error is not None:
             return error
 
